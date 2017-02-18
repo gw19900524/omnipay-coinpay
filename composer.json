@@ -1,0 +1,35 @@
+{
+  "name": "gw19900524/omnipay-coinpay",
+  "type": "library",
+  "description": "Coinpay gateway for Omnipay payment processing library",
+  "keywords": [
+    "coinpay",
+    "gateway",
+    "merchant",
+    "omnipay",
+    "pay",
+    "payment",
+    "purchase"
+  ],
+  "homepage": "https://github.com/gw19900524/omnipay-coinpay",
+  "license": "MIT",
+  "authors": [
+      {
+        "name": "Ethan",
+      }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Omnipay\\Coinpay\\": "src/",
+    },
+    "files": [
+      "src/Common/helpers.php"
+    ]
+  },
+  "require": {
+    "omnipay/common": "~2.0"
+  },
+  "require-dev": {
+    "omnipay/tests": "~2.0"
+  }
+}
