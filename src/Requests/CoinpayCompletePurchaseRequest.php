@@ -2,7 +2,8 @@
 
 namespace Omnipay\Coinpay\Requests;
 
-use Omnipay\Coinpay\Responses\LegacyCompletePurchaseResponse;
+use Omnipay\Coinpay\Common\Signer;
+use Omnipay\Coinpay\Responses\CoinpayCompletePurchaseResponse;
 use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\AbstractRequest;
 use Omnipay\Common\Message\ResponseInterface;
@@ -18,82 +19,103 @@ class CoinpayCompletePurchaseRequest extends AbstractRequest
      */
     public function getData()
     {
-        return $this->getParams();
+        $data = $this->parameters->all();
+        $data['sign_type'] = $this->getSignType();
+        $data['sign'] = $this->sign($data, $this->getSignType());
+        return $data;
     }
 
-
-    /**
-     * @return mixed
-     */
-    public function getParams()
-    {
-        return $this->getParameter('params');
-    }
-
-
-    /**
-     * Send the request with specified data
-     *
-     * @param  mixed $data The data to send
-     *
-     * @return ResponseInterface
-     */
     public function sendData($data)
     {
-        if (array_get($data, 'result')) {
-            $request = new LegacyVerifyAppPayReturnRequest($this->httpClient, $this->httpRequest);
-            $request->initialize($this->parameters->all());
-            $request->setResult($data['result']);
-            $request->setAlipayPublicKey($this->getAlipayPublicKey());
-            $data = $request->send()->getData();
-
-            $data = array_map(
-                function ($v) {
-                    return substr($v, 1, mb_strlen($v) - 2) . '';
-                },
-                $data
-            );
-
-            if (array_get($data, 'success') == 'true') {
-                $data['trade_status'] = 'TRADE_SUCCESS';
-            } else {
-                $data['trade_status'] = 'WAIT_BUYER_PAY';
-            }
-        } else {
-            $request = new LegacyNotifyRequest($this->httpClient, $this->httpRequest);
-            $request->initialize($this->parameters->all());
-            $request->setAlipayPublicKey($this->getAlipayPublicKey());
-            $request->setVerifyNotifyId($this->verifyNotifyId);
-            $request->setKey($this->getKey());
-            $response = $request->send();
-
-            $data = $response->getData();
-        }
-
-        return $this->response = new LegacyCompletePurchaseResponse($this, $data);
+        return $this->response = new CoinpayCompletePurchaseResponse($this, $data);
     }
 
-
-    /**
-     * @param $value
-     *
-     * @return $this
-     */
-    public function setParams($value)
+    public function getOrderSerialNumber()
     {
-        return $this->setParameter('params', $value);
+        return $this->getParameter('order_serial_number');
     }
 
-
-    /**
-     * @param boolean $verifyNotifyId
-     *
-     * @return LegacyCompletePurchaseRequest
-     */
-    public function setVerifyNotifyId($verifyNotifyId)
+    public function setOrderSerialNumber($value)
     {
-        $this->verifyNotifyId = $verifyNotifyId;
+        return $this->setParameter('order_serial_number', $value);
+    }
 
+    public function getSubject()
+    {
+        return $this->getParameter('subject');
+    }
+
+    public function setSubject($value)
+    {
+        return $this->setParameter('subject', $value);
+    }
+
+    public function getTotalFee()
+    {
+        return $this->getParameter('total_fee');
+    }
+
+    public function setTotalFee($value)
+    {
+        return $this->setParameter('total_fee', $value);
+    }
+
+    public function getStatus()
+    {
+        return $this->getParameter('status');
+    }
+
+    public function setStatus($value)
+    {
+        return $this->setParameter('status', $value);
+    }
+
+    public function getSignType()
+    {
+        return $this->sign_type;
+    }
+
+    public function setSignType($value)
+    {
+        $this->sign_type = $value;
         return $this;
     }
+
+    public function getSign()
+    {
+        return $this->sign;
+    }
+
+    public function setSign($value)
+    {
+        $this->sign = $value;
+        return $this;
+    }
+
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    public function setKey($value)
+    {
+        $this->key = $value;
+        return $this;
+    }
+    
+    private function sign($params, $signType)
+    {
+        $signer = new Signer($params);
+        $signType = strtoupper($signType);
+        if ($signType == 'MD5') {
+            if (! $this->getKey()) {
+                throw new InvalidRequestException('The `key` is required for `MD5` sign_type');
+            }
+            $sign = $signer->signWithMD5($this->getKey());
+        } else {
+            throw new InvalidRequestException('The signType is not allowed');
+        }
+        return $sign;
+    }
+
 }
