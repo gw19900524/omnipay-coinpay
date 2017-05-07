@@ -34,7 +34,7 @@ class CoinpayPurchaseResponse extends AbstractResponse implements RedirectRespon
 
     public function getRedirectUrl()
     {
-        return $this->request->getEndpoint() . '?' . http_build_query($this->getRedirectData());
+        return $this->request->getEndpoint() . 'unifiedorder/?' . http_build_query($this->getRedirectData());
     }
 
 

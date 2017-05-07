@@ -1,13 +1,13 @@
 <?php
 
-namespace Omnipay\Alipay\Common;
+namespace Omnipay\Coinpay\Common;
 
 use Exception;
 
 /**
- * Sign Tool for Alipay
+ * Sign Tool for Coinpay
  * Class Signer
- * @package Omnipay\Alipay\Common
+ * @package Omnipay\Coinpay\Common
  */
 class Signer
 {
@@ -246,7 +246,7 @@ class Signer
 
         if (! $res) {
             $message = "The public key is invalid";
-            $message .= "\n支付宝公钥格式有误，见 https://github.com/lokielse/omnipay-alipay/wiki/FAQs";
+            $message .= "\n公钥格式有误";
             throw new Exception($message);
         }
 

@@ -11,12 +11,7 @@ class Gateway extends AbstractGateway
 
     public function getDefaultParameters()
     {
-        return [
-            'inputCharset' => 'UTF-8',
-            'signType'     => 'MD5',
-            'paymentType'  => '1',
-            'alipaySdk'    => 'lokielse/omnipay-alipay',
-        ];
+        return [];
     }
     
     public function getName()
@@ -26,13 +21,11 @@ class Gateway extends AbstractGateway
 
     public function purchase(array $parameters = [])
     {
-        dd('purchase test');
         return $this->createRequest(CoinpayPurchaseRequest::class, $parameters);
     }
 
     public function completePurchase(array $parameters = [])
     {
-        dd('complete purchase test');
         return $this->createRequest(CoinpayCompletePurchaseRequest::class, $parameters);
     }
 
@@ -46,5 +39,35 @@ class Gateway extends AbstractGateway
 
     public function query(array $parameters = [])
     {
+    }
+    
+    public function getEndpoint()
+    {
+        return $this->getParameter('endpoint');
+    }
+    
+    public function setEndpoint($value)
+    {
+        return $this->setParameter('endpoint', $value);
+    }
+    
+    public function getSignType()
+    {
+        return $this->getParameter('sign_type');
+    }
+    
+    public function setSignType($value)
+    {
+        return $this->setParameter('sign_type', $value);
+    }
+    
+    public function getKey()
+    {
+        return $this->getParameter('key');
+    }
+    
+    public function setKey($value)
+    {
+        return $this->setParameter('key', $value);
     }
 }
